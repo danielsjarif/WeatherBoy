@@ -6,10 +6,21 @@ import Titles from './components/Titles';
 import Form from './components/Form';
 import Weather from './components/Weather';
 
-const API_KEY = "5186fa6ba646f8bce3bfc68de51c2804";
+const API_KEY = '5186fa6ba646f8bce3bfc68de51c2804';
 
 //React.component lives somewhere in node_modules
 class App extends React.Component {
+  state = {
+    //initial state of the object
+    //will change when button is pressed.
+    temperature: undefined,
+    city: undefined,
+    country: undefined,
+    humidity: undefined,
+    visibility: undefined,
+    description: undefined,
+    error: undefined
+  }
   //before you declare the function, put in async
   // for api/web request calls
   get_weather = async (e) => {
@@ -17,11 +28,20 @@ class App extends React.Component {
     e.preventDefault();
     const city = e.target.elements.city.value;
     const country = e.target.elements.country.value;
-
-
-    const api_call = await fetch(`api.openweathermap.org/data/2.5/weather?q=${city},${country}&appid=${API_KEY}&units=metric`);
+    const api_call = await fetch(`http://api.openweathermap.org/data/2.5/weather?q=${city},${country}&appid=${API_KEY}&units=metric`);
     const data = await api_call.json();
     console.log(data);
+    this.setState({
+      temperature: data.main.temp,
+      city: data.name,
+      country: data.sys.country,
+      humidity: data.main.humidity,
+      visibility: data.visibility,
+      description: data.weather[0].description,
+      //since weather contains an array
+
+      error: ''
+    });
   }
   //render method returns JSX which babel transpiles in the background
   render() {
@@ -29,7 +49,15 @@ class App extends React.Component {
       <div>
         <Titles />
         <Form get_weather = {this.get_weather}/>
-        <Weather />
+        <Weather
+          temperature = {this.state.temperature}
+          city = {this.state.city}
+          country = {this.state.country}
+          humidity = {this.state.humidity}
+          visibility = {this.state.visibility}
+          description = {this.state.description}
+          error = {this.state.error}
+           />
       </div>
     );
   }
